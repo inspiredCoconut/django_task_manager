@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "django-task-manager"
+version = "0.1.0"
+description = ""
+authors = ["InspiredCoconut <kricaldezfernandez@outlook.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+django = "^5.1.3"
+poethepoet = "^0.31.1"
+poetry-plugin-export = "^1.8.0"
+asyncio = "^3.4.3"
+
+[tool.poe.tasks]
+runserver = "python manage.py runserver"
+check = "python manage.py check"
+makemigrations = "python manage.py makemigrations"
+migrate = "python manage.py migrate"
+createsuperuser = "python manage.py createsuperuser"
+export = "poetry export -f requirements.txt --output requirements.txt --without-hashes"
+import = "poetry add $(cat requirements.txt | tr '\n' ' ')"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
