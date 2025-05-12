@@ -1,26 +1,26 @@
+import subprocess
+
 from celery import shared_task
 from .models import Task
 
-@shared_task
-def run_task(task_id):
+@shared_task(bind=True)
+def run_task(self, task_id):
     """
     Run a task by its ID.
     """
+    task = Task.objects.get(id=task_id)
+    task.status = 'running'
+    task.save()
     try:
-        task = Task.objects.get(id=task_id)
-        task.status = 'running'
+        # Example: run a long-running command
+        proc = subprocess.Popen(['sleep', '300'])  # Simulated long task
+        task.pid = proc.pid
         task.save()
-        
-        # Simulate some work being done
-        import time
-        time.sleep(5)  # Replace with actual task logic
-        print(f"Task {task.name} is running with PID {task.pid}")
-        
+
+        proc.wait()  # Wait until the process finishes
         task.status = 'done'
-        task.save()
-    except Task.DoesNotExist:
-        return f"Task with ID {task_id} does not exist."
+        task.result = 'Completed successfully'
     except Exception as e:
         task.status = 'failed'
-        task.save()
+        task.result = str(e)
         return str(e)

@@ -28,12 +28,17 @@
                     <a href="{% url 'task-delete' task.id %}" class="btn btn-danger btn-sm">Delete</a>
                     <a href="{% url 'task-detail' task.id %}" class="btn btn-info btn-sm">View</a>
                     <button hx-post="{% url 'task-start' task.id %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    hx-trigger="click" class="btn btn-success btn-sm">Start</button>
+                    hx-trigger="click" class="btn btn-success btn-sm" hx-swap="none">Start</button>
+                    <button hx-post="{% url 'task-stop' task.id %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                    hx-trigger="click" class="btn btn-secondary btn-sm" hx-swap="none">Stop</button>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div id="popup-message" style="position: absolute; top: 20px; right: 20px; background-color: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; display: none;">
+        This is a popup message!
+    </div>
 
     {% if tasks.has_other_pages %}
         {% if tasks.has_previous %}
@@ -62,5 +67,24 @@
         console.log("Task List Page Loaded");
         // Add any additional JavaScript here
     });
+
+    addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.xhr.status === 200) {
+            const response = event.detail.xhr.responseText;
+            const message = JSON.parse(response);
+            if (message) {
+                showPopupMessage(message);
+            }
+        }
+    });
+
+    function showPopupMessage(message) {
+        const popup = document.getElementById('popup-message');
+        popup.textContent = message;
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 5000);
+    }
 </script>
 {% endblock extra_js %}

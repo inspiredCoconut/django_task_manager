@@ -1,3 +1,6 @@
+import os
+import signal
+
 from django.views.generic import DetailView, ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
 from django.http import JsonResponse
@@ -76,5 +79,26 @@ def start_task(request, pk):
         run_task(task.id)
         
         return JsonResponse({'status': 'Task started', 'task_id': task.id})
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+    
+def stop_task(request, pk):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    try:
+        task = Task.objects.get(id=pk)
+        if task.pid:
+            # Stop the task using its PID
+            try:
+                os.kill(task.pid, signal.SIGTERM)  # Send SIGTERM to the process
+                task.status = 'stopped'
+                task.save()
+            except OSError as e:
+                print("Error stopping task:", e)
+                return JsonResponse({'error': str(e)}, status=500)
+        else:
+            return JsonResponse({'error': 'Task not running'}, status=400)
+        
+        return JsonResponse({'status': 'Task stopped', 'task_id': task.id})
     except Task.DoesNotExist:
         return JsonResponse({'error': 'Task not found'}, status=404)
