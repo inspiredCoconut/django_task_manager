@@ -1,0 +1,28 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Task Detail{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Task Detail</h1>
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">{{ task.title }}</h5>
+            <p class="card-text">{{ task.description }}</p>
+            <p class="card-text"><strong>Status:</strong> {{ task.get_status_display }}</p>
+            <a href="{% url 'task-update' task.id %}" class="btn btn-warning">Edit</a>
+            <a href="{% url 'task-delete' task.id %}" class="btn btn-danger">Delete</a>
+            <a href="{% url 'task-list' %}" class="btn btn-secondary">Back to Task List</a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        console.log("Task Detail Page Loaded");
+        // Add any additional JavaScript here
+    });
+</script>
+{% endblock extra_js %}    

@@ -1,6 +1,6 @@
 import time
 
-from .models import Task
+from core.utils import get_model_by_name
 
 async def main():
     # This is a main function example for a daemon task.
@@ -17,6 +17,9 @@ if __name__ == "__main__":
     asyncio.run(main())
     # This is where you would typically update the last_run field in the database
     # using an ORM like Django's ORM
-    task = Task.objects.get(id=1)  # Replace with the actual task ID
+    model = get_model_by_name('tasks', 'Task')
+    # Assuming you have a task instance to update
+    # Replace with the actual task instance you want to update
+    task = model.objects.get(id=1)  # Replace with the actual task ID
     task.last_run = time.now()
     task.save()

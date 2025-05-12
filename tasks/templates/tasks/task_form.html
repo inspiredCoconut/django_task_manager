@@ -1,0 +1,52 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Create Task{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">
+        {%if form_action == 'create' %}
+            Create Task
+        {% else %}
+            Edit Task
+        {% endif %}
+    </h1>
+    <form method="POST" action="{% if form_action == 'create' %}{% url 'task-create' %}{% else %}{% url 'task-edit' task.id %}{% endif %}">
+        {% if form_action == 'edit' %}
+            <input type="hidden" name="id" value="{{ task.id }}">
+        {% endif %}
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">
+            {% if form_action == 'create' %}
+                Create Task
+            {% else %}
+                Update Task
+            {% endif %}
+        </button>
+    </form>
+    <a href="{% url 'task-list' %}" class="btn btn-secondary mt-3">Back to Task List</a>
+    <div class="mt-3">
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <strong>Error:</strong>
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ field }}: {{ errors|join:", " }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        console.log("Task Create Page Loaded");
+        // Add any additional JavaScript here
+    });
+</script>
+{% endblock extra_js %}

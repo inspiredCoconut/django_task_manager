@@ -1,25 +1,19 @@
 from django.db import models
-from .daemon import main as daemon_main_function
+#from .daemon import main as daemon_main_function
 
 # Create your models here.
 class Task(models.Model):
     name = models.CharField(max_length=255)
-    pid = models.IntegerField()
-    description = models.TextField()
-    cron_schedule = models.CharField(max_length=255)
-    cron_job = models.CharField(max_length=255)
-    cron_job_id = models.CharField(max_length=255)
-    cron_job_name = models.CharField(max_length=255)
-    cron_job_description = models.TextField()
-    cron_job_args = models.TextField()
-    cron_job_kwargs = models.TextField()
-    cron_job_user = models.CharField(max_length=255)
+    pid = models.IntegerField(default=0)
+    description = models.TextField(default='', blank=True)
+    status = models.CharField(max_length=20, default='pending')  # e.g., pending, running, done, failed
     active = models.BooleanField(default=True)
+    result = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     last_run = models.DateTimeField(null=True, blank=True)
     
-    daemon_main_function = staticmethod(daemon_main_function)
+#    daemon_main_function = staticmethod(daemon_main_function)
 
     def __str__(self):
         return self.name

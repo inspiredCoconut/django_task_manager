@@ -1,0 +1,25 @@
+# poetry lock
+poetry.lock
+
+# pyenv
+.venv/
+
+# python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.eggs/
+*.mypy_cache/
+*.pytest_cache/
+*.coverage
+*.hypothesis/
+*.tox/
+
+# statifiles
+staticfiles/
+
+# env
+.env
