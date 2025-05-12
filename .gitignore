@@ -3,6 +3,8 @@ poetry.lock
 
 # pyenv
 .venv/
+# sqlite
+*.sqlite3
 
 # python cache
 __pycache__/

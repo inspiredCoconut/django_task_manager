@@ -13,7 +13,7 @@ def run_task(self, task_id):
     task.save()
     try:
         # Example: run a long-running command
-        proc = subprocess.Popen(['sleep', '300'])  # Simulated long task
+        proc = subprocess.Popen(['python3', '-m', "tasks.daemon"])  # Simulated long task
         task.pid = proc.pid
         task.save()
 
