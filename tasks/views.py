@@ -92,7 +92,9 @@ def stop_task(request, pk):
             try:
                 os.kill(task.pid, signal.SIGTERM)  # Send SIGTERM to the process
                 task.status = 'stopped'
+                task.pid = 0  # Clear the PID
                 task.save()
+                print(f"Stopped process with ID: {task.id}")
             except OSError as e:
                 print("Error stopping task:", e)
                 return JsonResponse({'error': str(e)}, status=500)

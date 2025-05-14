@@ -71,7 +71,7 @@
     addEventListener('htmx:afterRequest', function(event) {
         if (event.detail.xhr.status === 200) {
             const response = event.detail.xhr.responseText;
-            const message = JSON.parse(response);
+            const message = JSON.parse(response)?.status;
             if (message) {
                 showPopupMessage(message);
             }
