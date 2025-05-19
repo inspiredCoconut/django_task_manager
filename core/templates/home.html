@@ -1,0 +1,16 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block content %}
+<div class="container w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+    <h1 class="mt-5">Welcome to the Task Management System</h1>
+    <p class="lead">Manage your tasks efficiently and effectively.</p>
+    <a href="{% url 'task-list' %}" class="btn btn-primary mb-3">View Tasks</a>
+    <a href="{% url 'task-create' %}" class="btn btn-success mb-3">Create New Task</a>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+{{block.super}}
+{% endblock extra_js %}

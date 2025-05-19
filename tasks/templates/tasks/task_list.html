@@ -5,7 +5,11 @@
 {% block content %}
 <div class="container">
     <h1 class="mt-5">Task List</h1>
-    <a href="{% url 'task-create' %}" class="btn btn-primary mb-3">Create New Task</a>
+    <div class="d-flex justify-content-start align-items-center mb-3">
+        <a href="{% url 'home' %}" class="btn btn-secondary mb-3 mx-2">Home</a>
+        <a href="{% url 'task-list' %}" class="btn btn-secondary mb-3 mx-2">Refresh</a>
+        <a href="{% url 'task-create' %}" class="btn btn-primary mb-3 mx-2">Create New Task</a>
+    </div>
     <table class="table table-striped">
         <thead>
             <tr>

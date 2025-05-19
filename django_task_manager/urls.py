@@ -18,8 +18,10 @@ from django.contrib import admin
 from django.urls import path, include
 
 from tasks import urls as task_urls
+from core import urls as core_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('tasks/', include(task_urls)),
+    path('', include(core_urls)),
 ]
