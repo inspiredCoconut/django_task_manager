@@ -8,6 +8,21 @@
     <p class="lead">Manage your tasks efficiently and effectively.</p>
     <a href="{% url 'task-list' %}" class="btn btn-primary mb-3">View Tasks</a>
     <a href="{% url 'task-create' %}" class="btn btn-success mb-3">Create New Task</a>
+    <h2 class="mt-5">Actual system resources usage</h2>
+    <div class="card w-50">
+        <div class="card-body">
+            <h5 class="card-title">CPU Usage</h5>
+            <p class="card-text">{{ cpu_usage }}%</p>
+            <h5 class="card-title">Memory Usage</h5>
+            <p class="card-text">{{ memory_usage }}%</p>
+            <h5 class="card-title">Disk Usage</h5>
+            <p class="card-text">{{ disk_usage }}%</p>
+            <h5 class="card-title">Disk Space</h5>
+            <p class="card-text">{{ total_disk_space }} GB</p>
+            <h5 class="card-title">Free Disk</h5>
+            <p class="card-text">{{ free_disk_space }} GB</p>
+        </div>
+    </div>
 </div>
 {% endblock content %}
 

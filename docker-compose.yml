@@ -8,7 +8,13 @@ services:
       - "8000:8000"
     volumes:
        - .:/app  # Dev only
+       - /proc:/host_proc:ro
+       - /var/log:/host_logs:ro
+       - /sys/class/net:/host_net:ro
     environment:
+      - HOST_PROC=/host_proc
+      - HOST_LOGS=/host_logs
+      - HOST_NET=/host_net
       - DEBUG=True # Dev
       - CELERY_BROKER_URL=redis://redis:6379/0
     env_file:
