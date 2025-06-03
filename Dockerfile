@@ -63,13 +63,11 @@ RUN poetry run poe collectstatic
 # Migrate the database (production)
 RUN poetry run poe migrate
  
-# Expose Django's default port
-EXPOSE 8000
  
 # Production
-#CMD ["gunicorn", "django_task_manager.asgi:application", "--bind", "0.0.0.0:8000", "--workers", "5", "--threads", "21", \
-#"--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "120", \
-# "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["gunicorn", "django_task_manager.asgi:application", "--bind", "0.0.0.0:7000", "--workers", "5", "--threads", "21", \
+"--worker-class", "uvicorn.workers.UvicornWorker", "--timeout", "120", \
+ "--log-level", "debug", "--access-logfile", "-", "--error-logfile", "-"]
  
 # Development
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -48,6 +48,20 @@ INSTALLED_APPS = [
     #'manager',
 ]
 
+INSTALLED_APPS += ["channels"]
+
+ASGI_APPLICATION = "django_task_manager.asgi.application"
+
+# Use Redis as the channel layer backend
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],  # Use Redis container or host IP
+        },
+    },
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,7 +94,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'django_task_manager.wsgi.application'
+# WSGI_APPLICATION = 'django_task_manager.wsgi.application'
 
 
 # Database

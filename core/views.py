@@ -21,4 +21,5 @@ class HomeView(View):
             'total_disk_space': total_disk_space,
             'free_disk_space': free_disk_space,
         }
+        
         return render(request, 'home.html', context)

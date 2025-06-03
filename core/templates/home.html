@@ -28,4 +28,24 @@
 
 {% block extra_js %}
 {{block.super}}
+<script>
+    // Creata a socket connection to the server for retreiving real-time stats updates
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/stats/');
+    socket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Received data:', data);
+        document.querySelector('.card-text:nth-child(2)').textContent = data?.cpu_usage + '%';
+        document.querySelector('.card-text:nth-child(4)').textContent = data?.memory_usage + '%';
+        document.querySelector('.card-text:nth-child(6)').textContent = data?.disk_usage + '%';
+        document.querySelector('.card-text:nth-child(8)').textContent = data?.total_disk_space + ' GB';
+        document.querySelector('.card-text:nth-child(10)').textContent = data?.free_disk_space + ' GB';
+    };
+    socket.onclose = function(event) {
+        console.error('WebSocket closed unexpectedly');
+    };
+    socket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
+
+</script>
 {% endblock extra_js %}

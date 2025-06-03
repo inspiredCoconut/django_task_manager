@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: django_web
     ports:
-      - "8000:8000"
+      - 7000
     volumes:
        - .:/app  # Dev only
        - /proc:/host_proc:ro
@@ -40,3 +40,16 @@ services:
     restart: always
     ports:
       - "6379:6379"
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - 80:80
+      - 8000:8000  # Mapping the original port to Nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./staticfiles/:/app/media
+    depends_on:
+      - web
+    restart: always
