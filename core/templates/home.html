@@ -9,18 +9,38 @@
     <a href="{% url 'task-list' %}" class="btn btn-primary mb-3">View Tasks</a>
     <a href="{% url 'task-create' %}" class="btn btn-success mb-3">Create New Task</a>
     <h2 class="mt-5">Actual system resources usage</h2>
-    <div class="card w-50">
-        <div class="card-body">
-            <h5 class="card-title">CPU Usage</h5>
-            <p class="card-text">{{ cpu_usage }}%</p>
-            <h5 class="card-title">Memory Usage</h5>
-            <p class="card-text">{{ memory_usage }}%</p>
-            <h5 class="card-title">Disk Usage</h5>
-            <p class="card-text">{{ disk_usage }}%</p>
-            <h5 class="card-title">Disk Space</h5>
-            <p class="card-text">{{ total_disk_space }} GB</p>
-            <h5 class="card-title">Free Disk</h5>
-            <p class="card-text">{{ free_disk_space }} GB</p>
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+        <div class="card w-50 d-flex flex-column p-2">
+            <div class="card-header">
+                <h3>System Resources</h3>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">CPU Usage</h5>
+                <p class="card-text">{{ cpu_usage }}%</p>
+                <h5 class="card-title">Memory Usage</h5>
+                <p class="card-text">{{ memory_usage }}%</p>
+                <h5 class="card-title">Disk Usage</h5>
+                <p class="card-text">{{ disk_usage }}%</p>
+                <h5 class="card-title">Disk Space</h5>
+                <p class="card-text">{{ total_disk_space }} GB</p>
+                <h5 class="card-title">Free Disk</h5>
+                <p class="card-text">{{ free_disk_space }} GB</p>
+                <div style="width: 800px;">
+                    <canvas id="cpuChart"></canvas>
+                    <canvas id="memoryChart"></canvas>
+                    <canvas id="diskChart"></canvas>
+                    <canvas id="diskSpaceChart"></canvas>
+                    <canvas id="freeDiskChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="card w-50 d-flex flex-column p-2">
+            <div class="card-header">
+                <h3>System Tasks</h3>
+            </div>
+            <div class="card-body" id="processes-list">
+                
+            </div>
         </div>
     </div>
 </div>
@@ -29,7 +49,7 @@
 {% block extra_js %}
 {{block.super}}
 <script>
-    // Creata a socket connection to the server for retreiving real-time stats updates
+    // Create a socket connection to the server for retreiving real-time stats updates
     const socket = new WebSocket('ws://' + window.location.host + '/ws/stats/');
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
@@ -45,6 +65,30 @@
     };
     socket.onerror = function(error) {
         console.error('WebSocket error:', error);
+    };
+    // Create a socket connection for CPU, Memory, Disk Usage, Disk Space, and Free Disk
+    const socketProcesses = new WebSocket('ws://' + window.location.host + '/ws/processes/');
+    socketProcesses.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('Received process data:', data?.length, 'processes');
+        let cardBody = document.getElementById('processes-list');
+        cardBody.innerHTML = ''; // Clear previous content
+        if (data && data?.length > 0) {
+            data?.forEach(process => {
+                const p = document.createElement('p');
+                p.className = 'card-text';
+                p.textContent = `${process.name} - ${process.cpu_percent}% CPU, ${process.memory_percent}% Memory`;
+                cardBody.appendChild(p);
+            });
+        } else {
+            cardBody.innerHTML = '<p class="card-text">No processes running.</p>';
+        }
+    };
+    socketProcesses.onclose = function(event) {
+        console.error('WebSocket for processes closed unexpectedly');
+    };
+    socketProcesses.onerror = function(error) {
+        console.error('WebSocket for processes error:', error);
     };
 
 </script>

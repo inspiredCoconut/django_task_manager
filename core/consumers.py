@@ -30,3 +30,28 @@ class StatsConsumer(AsyncWebsocketConsumer):
             }
             await self.send(text_data=json.dumps(stats))
             await asyncio.sleep(2)  # send every 2 seconds
+
+class ProcessListConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        self.running = True
+        asyncio.create_task(self.stream_processes())
+
+    async def disconnect(self, close_code):
+        self.running = False
+
+    async def stream_processes(self):
+        while self.running:
+            processes = []
+            for proc in psutil.process_iter(['pid', 'name', 'cpu_percent', 'memory_percent']):
+                try:
+                    info = proc.info
+                    processes.append(info)
+                except psutil.NoSuchProcess:
+                    continue
+
+            # Sort by CPU usage
+            processes = sorted(processes, key=lambda x: x['cpu_percent'], reverse=True)[:10]
+
+            await self.send(text_data=json.dumps(processes))
+            await asyncio.sleep(3)  # 
