@@ -9,32 +9,32 @@
     <a href="{% url 'task-list' %}" class="btn btn-primary mb-3">View Tasks</a>
     <a href="{% url 'task-create' %}" class="btn btn-success mb-3">Create New Task</a>
     <h2 class="mt-5">Actual system resources usage</h2>
-    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
-        <div class="card w-50 d-flex flex-column p-2">
+    <div class="d-flex justify-content-between flex-column align-items-center mb-3 w-100">
+        <div class="card w-100 d-flex flex-column p-2 m-2">
             <div class="card-header">
                 <h3>System Resources</h3>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">CPU Usage</h5>
-                <p class="card-text">{{ cpu_usage }}%</p>
-                <h5 class="card-title">Memory Usage</h5>
-                <p class="card-text">{{ memory_usage }}%</p>
-                <h5 class="card-title">Disk Usage</h5>
-                <p class="card-text">{{ disk_usage }}%</p>
-                <h5 class="card-title">Disk Space</h5>
-                <p class="card-text">{{ total_disk_space }} GB</p>
-                <h5 class="card-title">Free Disk</h5>
-                <p class="card-text">{{ free_disk_space }} GB</p>
-                <div style="width: 800px;">
-                    <canvas id="cpuChart"></canvas>
-                    <canvas id="memoryChart"></canvas>
-                    <canvas id="diskChart"></canvas>
-                    <canvas id="diskSpaceChart"></canvas>
-                    <canvas id="freeDiskChart"></canvas>
+            <div class="card-body w-100 d-flex align-items-center justify-content-between flex-wrap">
+                <div class="d-flex w-20 justify-content-start flex-column align-items-center">
+                    <h5 class="card-title">CPU Usage</h5>
+                    <p class="card-text">{{ cpu_usage }}%</p>
+                    <h5 class="card-title">Memory Usage</h5>
+                    <p class="card-text">{{ memory_usage }}%</p>
+                    <h5 class="card-title">Disk Usage</h5>
+                    <p class="card-text">{{ disk_usage }}%</p>
+                    <h5 class="card-title">Disk Space</h5>
+                    <p class="card-text">{{ total_disk_space }} GB</p>
+                    <h5 class="card-title">Free Disk</h5>
+                    <p class="card-text">{{ free_disk_space }} GB</p>
+                </div>
+                <div class="d-flex w-80 justify-content-end">
+                    <div id="containerCpu"></div>
+                    <div id="containerMemory"></div>
+                    <div id="containerDiskUsage"></div>
                 </div>
             </div>
         </div>
-        <div class="card w-50 d-flex flex-column p-2">
+        <div class="card w-100 d-flex flex-column p-2 m-2">
             <div class="card-header">
                 <h3>System Tasks</h3>
             </div>
@@ -49,16 +49,102 @@
 {% block extra_js %}
 {{block.super}}
 <script>
+    // Function to create chart using d3.js
+    function initDonutChart(values, idElement){
+        const data = values;
+        const pie = d3.pie();
+        const arcs = pie(data);
+
+        const width = 300, height = 300, radius = Math.min(width, height) / 2;
+        const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+        const svg = d3.select(`#${idElement}`)
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height)
+            .append("g")
+            .attr("transform", `translate(${width / 2},${height / 2})`);
+
+        svg.selectAll("path")
+            .data(arcs)
+            .enter()
+            .append("path")
+            .attr("d", d3.arc()
+            .innerRadius(100) // Set innerRadius to create donut
+            .outerRadius(150)
+            )
+            .attr("fill", (d, i) => color(i))
+            .attr("stroke", "#fff")
+            .attr("stroke-width", "2px");
+
+        // Add the value of the first element in the center
+        svg.append("text")
+            .attr("text-anchor", "middle")
+            .attr("dy", "0.35em")
+            .attr("font-size", "2em")
+            .attr("font-weight", "bold")
+            .text(data[0] + "%");
+    }
+    // Initialize the donut chart with the initial values
+    const cpuValues = [{{ cpu_usage }}, 100 - {{ cpu_usage }}];
+    const memoryValues = [{{ memory_usage }}, 100 - {{ memory_usage }}];
+    const diskValues = [{{ disk_usage }}, 100 - {{ disk_usage }}];
+    const totalDiskValues = [{{ total_disk_space }}, 100 - {{ total_disk_space }}];
+    const freeDiskValues = [{{ free_disk_space }}, 100 - {{ free_disk_space }}];
+
+    initDonutChart(cpuValues, 'containerCpu');
+    initDonutChart(memoryValues, 'containerMemory');
+    initDonutChart(diskValues, 'containerDiskUsage');
+    // Function to update the donut chart with new values
+    function updateDonutChart(values, idElement) {
+        const data = values;
+        const pie = d3.pie();
+        const arcs = pie(data);
+
+        const svg = d3.select(`#${idElement} svg g`);
+
+        svg.selectAll("path")
+            .data(arcs)
+            .transition()
+            .duration(500)
+            .attr("d", d3.arc()
+                .innerRadius(100) // Set innerRadius to create donut
+                .outerRadius(150)
+            );
+        
+            svg.selectAll("text")
+                .data([data[0]])
+                .join("text")
+                .attr("text-anchor", "middle")
+                .attr("dy", "0.35em")
+                .attr("font-size", "2em")
+                .attr("font-weight", "bold")
+                .text(data[0]+ "%");
+    }
+
+
     // Create a socket connection to the server for retreiving real-time stats updates
     const socket = new WebSocket('ws://' + window.location.host + '/ws/stats/');
     socket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-        console.log('Received data:', data);
         document.querySelector('.card-text:nth-child(2)').textContent = data?.cpu_usage + '%';
         document.querySelector('.card-text:nth-child(4)').textContent = data?.memory_usage + '%';
         document.querySelector('.card-text:nth-child(6)').textContent = data?.disk_usage + '%';
         document.querySelector('.card-text:nth-child(8)').textContent = data?.total_disk_space + ' GB';
         document.querySelector('.card-text:nth-child(10)').textContent = data?.free_disk_space + ' GB';
+        // Check if data value is more than 0.1 else set it to 0.1
+        data.cpu_usage = data.cpu_usage > 0.1 ? data.cpu_usage : 0.1;
+        data.memory_usage = data.memory_usage > 0.1 ? data.memory_usage : 0.1;
+        data.disk_usage = data.disk_usage > 0.1 ? data.disk_usage : 0.1;
+        data.total_disk_space = data.total_disk_space > 0.1 ? data.total_disk_space : 0.1;
+        data.free_disk_space = data.free_disk_space > 0.1 ? data.free_disk_space : 0.1;
+
+        // Update the donut charts with new values
+        updateDonutChart([data?.cpu_usage, 100 - data?.cpu_usage], 'containerCpu');
+        updateDonutChart([data?.memory_usage, 100 - data?.memory_usage], 'containerMemory');
+        updateDonutChart([data?.disk_usage, 100 - data?.disk_usage], 'containerDiskUsage');
+        // Log the received data for debugging
+        console.log('Updated system resources:', data);
     };
     socket.onclose = function(event) {
         console.error('WebSocket closed unexpectedly');
