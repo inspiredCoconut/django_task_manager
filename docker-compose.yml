@@ -8,10 +8,12 @@ services:
       - 7000
     volumes:
        - .:/app  # Dev only
+       - /:/host_root:ro  # Read-only access to the host root
        - /proc:/host_proc:ro
        - /var/log:/host_logs:ro
        - /sys/class/net:/host_net:ro
     environment:
+      - HOST_ROOT=/host_root
       - HOST_PROC=/host_proc
       - HOST_LOGS=/host_logs
       - HOST_NET=/host_net
