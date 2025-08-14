@@ -1,3 +1,6 @@
+volumes:
+  postgres_data_test:
+
 services:
   web:
     build:
@@ -6,6 +9,7 @@ services:
     container_name: django_web
     ports:
       - 7000
+    command: ["sh", "entrypoint.sh"]
     volumes:
        - .:/app  # Dev only
        - /:/host_root:ro  # Read-only access to the host root
@@ -22,7 +26,21 @@ services:
     env_file:
       - .env
     depends_on:
+      - db
       - redis
+
+    restart: always
+  db:
+    image: postgres:14
+    container_name: postgres_db
+    environment:
+      - POSTGRES_DB=django_db
+      - POSTGRES_USER=django_user
+      - POSTGRES_PASSWORD=django_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_test:/var/lib/postgresql/data
     restart: always
   celery:
     build: .

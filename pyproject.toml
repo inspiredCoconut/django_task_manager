@@ -20,6 +20,8 @@ channels-redis = "^4.2.1"
 gunicorn = "^23.0.0"
 uvicorn = "^0.34.0"
 websockets = "^15.0.1"
+postgis = "^1.0.4"
+psycopg2 = "^2.9.10"
 
 [tool.poe.tasks]
 runserver = "python manage.py runserver"
